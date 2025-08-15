@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>PvP Mini App</title>
+</head>
+<body>
+  <h2>PvP Mini App</h2>
+  <div id="user"></div>
+
+  <div>
+    <h3>Баланс</h3>
+    <div>⭐️ Звёзды: <span id="stars">—</span></div>
+    <div id="gifts"></div>
+    <button id="refresh">Обновить</button>
+  </div>
+
+  <hr/>
+  <div>
+    <h3>Начать бой</h3>
+    <label>
+      Валюта:
+      <select id="currency">
+        <option value="stars">Звёзды</option>
+        <option value="gifts">Подарки</option>
+      </select>
+    </label>
+    <div id="starsInput">
+      <input id="amount" type="number" min="1" placeholder="Ставка в звёздах"/>
+    </div>
+    <div id="giftsInput" style="display:none;">
+      Пример ввода: <code>ROSE:2,COOKIE:1</code><br/>
+      <input id="giftsBlob" type="text" placeholder="ROSE:1,BOX:2"/>
+    </div>
+    <button id="start">Создать матч и поставить</button>
+    <div id="result"></div>
+  </div>
+
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

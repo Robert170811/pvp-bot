@@ -1,0 +1,71 @@
+const tg = window.Telegram.WebApp;
+tg.expand();
+
+const userDiv = document.getElementById('user');
+const starsSpan = document.getElementById('stars');
+const giftsDiv = document.getElementById('gifts');
+const refreshBtn = document.getElementById('refresh');
+const currencySel = document.getElementById('currency');
+const amountInput = document.getElementById('amount');
+const giftsInput = document.getElementById('giftsInput');
+const starsInput = document.getElementById('starsInput');
+const giftsBlobInput = document.getElementById('giftsBlob');
+const startBtn = document.getElementById('start');
+const resultDiv = document.getElementById('result');
+
+userDiv.innerText = `Пользователь: ${tg.initDataUnsafe?.user?.username || tg.initDataUnsafe?.user?.id}`;
+
+currencySel.addEventListener('change', () => {
+  const v = currencySel.value;
+  if (v === 'stars') {
+    starsInput.style.display = '';
+    giftsInput.style.display = 'none';
+  } else {
+    starsInput.style.display = 'none';
+    giftsInput.style.display = '';
+  }
+});
+
+async function api(path, body) {
+  const resp = await fetch(`/api${path}`, {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({
+      initData: tg.initData || null,
+      payload: body
+    })
+  });
+  return resp.json();
+}
+
+async function loadMe() {
+  const data = await api('/me', {});
+  if (data.ok) {
+    starsSpan.innerText = data.me.stars;
+    giftsDiv.innerHTML = '<ul>' + data.me.gifts.map(g => `<li>${g.title}: ${g.qty} (⭐️${g.value})</li>`).join('') + '</ul>';
+    resultDiv.innerText = '';
+  } else {
+    resultDiv.innerText = 'Ошибка: ' + data.error;
+  }
+}
+
+refreshBtn.addEventListener('click', loadMe);
+
+startBtn.addEventListener('click', async () => {
+  const currency = currencySel.value;
+  let bet = {};
+  if (currency === 'stars') {
+    bet.amount = parseInt(amountInput.value || '0');
+  } else {
+    bet.gifts = giftsBlobInput.value; // валидация на сервере
+  }
+  const res = await api('/start_fight', { currency, bet });
+  if (res.ok) {
+    resultDiv.innerText = res.message;
+    await loadMe();
+  } else {
+    resultDiv.innerText = 'Ошибка: ' + res.error;
+  }
+});
+
+loadMe();
